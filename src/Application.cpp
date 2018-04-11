@@ -38,14 +38,18 @@ int main(void)
 
     float positions[6] = {
         -0.5, -0.5,
-        0.0, 0.5,
-        0.5, -0.5
+         0.0,  0.5,
+         0.5, -0.5
     };
 
     unsigned int buffer;
     glGenBuffers(1, &buffer); // Generate a single buffer
     glBindBuffer(GL_ARRAY_BUFFER, buffer); // Select the buffer to be drawn
     glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), positions, GL_STATIC_DRAW); // Add the data to the buffer
+
+    /* Create a layout for the buffer we created */
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -54,8 +58,6 @@ int main(void)
         glClear(GL_COLOR_BUFFER_BIT);
 
         /* Draw the triangle */
-        // At the moment, this draws nothing because it doesn't specify anything about 
-        // the current selected buffer. OpenGL doesn't know yet how to draw this.
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         /* Swap front and back buffers */
