@@ -139,21 +139,35 @@ int main(void)
     std::cout << glGetString(GL_VERSION) << std::endl;
 
 
-    // Create and select the data & buffer for drawing
-    float positions[6] = {
+    // Create and select (bind) the data & buffer for drawing
+    float positions[] = {
         -0.5, -0.5,
-         0.0,  0.5,
-         0.5, -0.5
+         0.5, -0.5,
+         0.5,  0.5,
+        -0.5,  0.5
+    };
+
+    // The indexes of the vertices we want to draw
+    unsigned int indices[] =
+    {
+        0, 1, 2,
+        2, 3, 0
     };
 
     unsigned int buffer;
     glGenBuffers(1, &buffer); // Generate a single buffer
     glBindBuffer(GL_ARRAY_BUFFER, buffer); // Select the buffer to be drawn
-    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), positions, GL_STATIC_DRAW); // Add the data to the buffer
+    glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), positions, GL_STATIC_DRAW); // Add the data to the buffer
 
     // Create a layout for the buffer we created
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+
+    // Create and bind a buffer for the indices
+    unsigned int ibo; // index buffer object
+    glGenBuffers(1, &ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
     // Creating the shaders
     ShaderProgramSource source = ParseShader("res/shaders/Basic.shader");
@@ -164,7 +178,10 @@ int main(void)
     while (!glfwWindowShouldClose(window))
     {
         glClear(GL_COLOR_BUFFER_BIT); // Render here
-        glDrawArrays(GL_TRIANGLES, 0, 3); // Draw the current selected buffer
+
+        // Draw the current selected buffer
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr); // nullptr, because the indices are bound to the current buffer: GL_ELEMENT_ARRAY_BUFFER
+
         glfwSwapBuffers(window); // Swap front and back buffers
         glfwPollEvents(); // Poll for and process events
     }
