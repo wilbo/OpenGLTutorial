@@ -193,7 +193,7 @@ int main(void)
     unsigned int buffer;
     GLCall(glGenBuffers(1, &buffer)); // Generate a single buffer
     GLCall(glBindBuffer(GL_ARRAY_BUFFER, buffer)); // Select the buffer to be drawn
-    GLCall(glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), positions, GL_STATIC_DRAW)); // Add the data to the buffer
+    GLCall(glBufferData(GL_ARRAY_BUFFER, 4 * 2 * sizeof(float), positions, GL_STATIC_DRAW)); // Add the data to the buffer
 
     // Create a layout for the buffer we created
     GLCall(glEnableVertexAttribArray(0));
