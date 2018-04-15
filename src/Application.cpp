@@ -152,6 +152,11 @@ int main(void)
     if (!glfwInit())
         return -1;
 
+    // Use the core profile to enforce our own implementation of a vertex array
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
     // Create a windowed mode window and its OpenGL context
     window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
     if (!window)
@@ -190,6 +195,11 @@ int main(void)
         2, 3, 0
     };
 
+    // Initialize our vertex array object
+    unsigned int vao;
+    GLCall(glGenVertexArrays(1, &vao));
+    GLCall(glBindVertexArray(vao));
+
     unsigned int buffer;
     GLCall(glGenBuffers(1, &buffer)); // Generate a single buffer
     GLCall(glBindBuffer(GL_ARRAY_BUFFER, buffer)); // Select the buffer to be drawn
@@ -197,7 +207,7 @@ int main(void)
 
     // Create a layout for the buffer we created
     GLCall(glEnableVertexAttribArray(0));
-    GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0));
+    GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0)); // links the buffer with the vao
 
     // Create and bind a buffer for the indices
     unsigned int ibo; // index buffer object
@@ -208,7 +218,6 @@ int main(void)
     // Creating the shaders
     ShaderProgramSource source = ParseShader("res/shaders/Basic.shader");
     unsigned int shader = CreateShader(source.VertexSource, source.FragmentSource);
-    GLCall(glUseProgram(shader));
 
     // Set the color of every pixel using uniforms
     GLCall(int location = glGetUniformLocation(shader, "u_Color"));
@@ -221,8 +230,11 @@ int main(void)
     {
         GLCall(glClear(GL_COLOR_BUFFER_BIT)); // Render here
 
-        // Set the color
-        GLCall(glUniform4f(location, r, 0.3, 0.8, 1.0));
+        GLCall(glUseProgram(shader)); // bind the shader
+        GLCall(glUniform4f(location, r, 0.3, 0.8, 1.0)); // Set the color in the shader with the use of a uniform
+        GLCall(glBindVertexArray(vao)); // bind the vertex array (vertex buffer and layout)
+        GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo)); // bind the indices
+
         // Draw the current selected buffer
         GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr)); // nullptr, because the indices are bound to the current buffer: GL_ELEMENT_ARRAY_BUFFER
 
