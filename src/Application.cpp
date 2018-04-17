@@ -9,6 +9,7 @@
 #include "Renderer.h"
 
 #include "VertexBuffer.h"
+#include "VertexBufferLayout.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "Shader.h"
@@ -65,39 +66,38 @@ int main(void)
         };
 
         VertexArray va; // Initialize our vertex array 
-        VertexBuffer vb(positions, 4 * 2 * sizeof(float)); // Create and bind a buffer for the vertices
-        VertexBufferLayout layout; // Create a layout for the buffer we created
-        layout.Push<float>(2); // 
-        va.AddBuffer(vb, layout);
 
-        // Create and bind a buffer for the indices
-        IndexBuffer ib(indices, 6);
+        VertexBuffer vb(positions, 4 * 2 * sizeof(float)); // Create and bind a buffer for the vertices
+
+        VertexBufferLayout layout; // Create a layout for the buffer we created
+        layout.Push<float>(2);
+
+        va.AddBuffer(vb, layout);
+        
+        IndexBuffer ib(indices, 6); // Create and bind a buffer for the indices
        
         Shader shader("res/shaders/Basic.shader");
-        shader.Bind();
-        shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
 
         va.Unbind();
         shader.Unbind();
         vb.Unbind();
         ib.Unbind();
 
+        Renderer renderer;
+
+        // Animation stuff
         float r = 0.0f;
         float increment = 0.05f;
 
         // Loop until the user closes the window
         while (!glfwWindowShouldClose(window))
         {
-            GLCall(glClear(GL_COLOR_BUFFER_BIT)); // Render here
+            renderer.Clear();
 
             shader.Bind();
             shader.SetUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f);
 
-            va.Bind(); // bind the vertex array (vertex buffer and layout)
-            ib.Bind(); // bind the indices
-
-            // Draw the current selected buffer
-            GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr)); // nullptr, because the indices are bound to the current buffer: GL_ELEMENT_ARRAY_BUFFER
+            renderer.Draw(va, ib, shader);
 
             // Animate the r value between 0.0 and 1.0
             if (r > 1.0f)
