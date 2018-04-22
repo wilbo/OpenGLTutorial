@@ -13,6 +13,7 @@
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "Shader.h"
+#include "Texture.h"
 
 int main(void)
 {
@@ -52,10 +53,10 @@ int main(void)
         // Create and select (bind) the data & buffer for drawing
         float positions[] =
         {
-            -0.5, -0.5, // bottom-left
-             0.5, -0.5, // bottom right
-             0.5,  0.5, // top right
-            -0.5,  0.5  // top left
+            -0.5, -0.5, 0.0f, 0.0f, // bottom-left
+             0.5, -0.5, 1.0f, 0.0f, // bottom right
+             0.5,  0.5, 1.0f, 1.0f, // top right
+            -0.5,  0.5, 0.0f, 1.0f, // top left
         };
 
         // The indexes of the vertices we want to draw
@@ -65,11 +66,15 @@ int main(void)
             2, 3, 0
         };
 
+        GLCall(glEnable(GL_BLEND));
+        GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
         VertexArray va; // Initialize our vertex array 
 
-        VertexBuffer vb(positions, 4 * 2 * sizeof(float)); // Create and bind a buffer for the vertices
+        VertexBuffer vb(positions, 4 * 4 * sizeof(float)); // Create and bind a buffer for the vertices
 
         VertexBufferLayout layout; // Create a layout for the buffer we created
+        layout.Push<float>(2);
         layout.Push<float>(2);
 
         va.AddBuffer(vb, layout);
@@ -77,11 +82,17 @@ int main(void)
         IndexBuffer ib(indices, 6); // Create and bind a buffer for the indices
        
         Shader shader("res/shaders/Basic.shader");
+        shader.Bind();
+        shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
+
+        Texture texture("res/textures/ChernoLogo.png");
+        texture.Bind();
+        shader.SetUniform1i("u_Texture", 0);
 
         va.Unbind();
-        shader.Unbind();
         vb.Unbind();
         ib.Unbind();
+        shader.Unbind();
 
         Renderer renderer;
 
