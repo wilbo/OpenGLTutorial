@@ -32,7 +32,7 @@ int main(void)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Create a windowed mode window and its OpenGL context
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(960, 540, "Hello World", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -56,10 +56,10 @@ int main(void)
         // Create and select (bind) the data & buffer for drawing
         float positions[] =
         {
-            -0.5, -0.5, 0.0f, 0.0f, // bottom-left
-             0.5, -0.5, 1.0f, 0.0f, // bottom right
-             0.5,  0.5, 1.0f, 1.0f, // top right
-            -0.5,  0.5, 0.0f, 1.0f, // top left
+            100.0f, 100.0f, 0.0f, 0.0f, // bottom-left
+            200.0f, 100.0f, 1.0f, 0.0f, // bottom right
+            200.0f, 200.0f, 1.0f, 1.0f, // top right
+            100.0f, 200.0f, 0.0f, 1.0f, // top left
         };
 
         // The indexes of the vertices we want to draw
@@ -84,7 +84,7 @@ int main(void)
         
         IndexBuffer ib(indices, 6); // Create and bind a buffer for the indices
 
-        glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
+        glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
        
         Shader shader("res/shaders/Basic.shader");
         shader.Bind();
